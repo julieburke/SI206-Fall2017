@@ -70,7 +70,7 @@ class Deck(object):
 				self.cards.append(card)
 
 
-def play_war_game(testing=False):
+def play_war_game(testing=True):
 	# Call this with testing = True and it won't print out all the game stuff -- makes it hard to see test results
 	player1 = Deck()
 	player2 = Deck()
@@ -189,12 +189,17 @@ class CardTests(unittest.TestCase):
     #described tests). Make sure to include a descriptive message in
     #these two so we can easily see what you are testing!
     def test_myTestInstance1(self):
-    	#d= Deck()
-    	#self.assertEqual(d.__str__(), str)
+    #check that the sort method works by checking the first item in the deck after sorting 
+    	d= Deck()
+    	d.sort_cards()
+    	print (d.cards[0].__str__())
+    	self.assertEqual(d.cards[0].__str__(), Card(suit = 0, rank = 1).__str__())
     def test_myTestInstance2(self):
-    	#p = play_war_game()
-    	#self.assertEqual(type(p[0]), str)
+    	d = Deck()
+    	c = Card()
+    	self.assertEqual(type(d.pop_card()), type(c))
 #############
 ## The following is a line to run all of the tests you include:
+
 unittest.main(verbosity=2) 
 ## verbosity 2 to see detail about the tests the code fails/passes/etc.
