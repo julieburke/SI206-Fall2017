@@ -28,6 +28,7 @@ from bs4 import BeautifulSoup
 
 def find_urls(s):
     #Your code here
+    #http or https://
     #x = re.findall('(http|https)://\S\S\.\S\S+*[^\s]', s)
     #print (x)
     pass
