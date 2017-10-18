@@ -2,7 +2,7 @@
 
 ## COMMENT HERE WITH:
 ## Your name: Julie Burke
-## Anyone you worked with on this project:
+## Anyone you worked with on this project: Olivia Gardella
 
 ## Below we have provided import statements, comments to separate out the 
 #parts of the project, instructions/hints/examples, and at the end, TESTS.
