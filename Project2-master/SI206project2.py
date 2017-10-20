@@ -28,7 +28,10 @@ import urllib.request, urllib.parse, urllib.error
 ## find_urls("the internet is awesome #worldwideweb") should return [], empty list
 
 def find_urls(s):
-    #Your code here
+    #Find all URLS by looking for 
+    #Anything that begins with http:// or https:// 
+    #Includes at least one . (each followed by at least 2 characters)
+    #Includes no whitespace characters
     x = re.findall('(?:http|https)://\w+(?:\.[a-zA-Z]{2,})+', s)
     return x
 
@@ -39,15 +42,18 @@ def find_urls(s):
 
 def grab_headlines():
     #Your code here
-    #address = 'http://www.michigandaily.com/section/opinion'
+    address = 'http://www.michigandaily.com/section/opinion'
     titles = []
-    address = 'file:///Users/JulieBurke1/Documents/SI206/SI206-Fall2017/Project2-master/opinion.html'
+    #address = 'file:///Users/JulieBurke1/Documents/SI206/SI206-Fall2017/Project2-master/opinion.html'
+    #read the website and convert to beatiful soup object
     html = urllib.request.urlopen(address).read()
     soup = BeautifulSoup(html, 'html.parser')
     tags = soup('aside')
     for tag in tags:
+        #find all article titles 
         x = re.findall('<li.+href.+>(.+)</a></li>', str(tag))
         for item in x:
+            #append titles to list to be returned 
             titles.append(item)
     return titles
 
@@ -68,13 +74,15 @@ def get_umsi_data():
     umsi_titles = {}
     base_url = 'https://www.si.umich.edu/directory?field_person_firstname_value=&field_person_lastname_value=&rid=All'
     urls = [base_url]
+    #compile list of URLs for pages 0 to 12
     for num in [1,2,3,4,5,6,7,8,9,10,11,12]:
         urls.append(base_url + '&page=' + str(num)) 
     for url in urls:
+        #read the website and convert to beatiful soup object
         x = requests.get(url, headers={'User-Agent': 'SI_CLASS'})
         soup = BeautifulSoup(x.content, 'html.parser')
         tags = soup('body')
-        #print ('tags', tags)
+        #search for name and values and append to dictionary 
         for tag in tags:
             names = re.findall('property="dc:title"><h2>(.+)</h2>', str(tag))
             values = re.findall('<div class="field-item even">(.+)</div></div></div></div>', str(tag))
@@ -88,7 +96,7 @@ def get_umsi_data():
 ## INPUT: The dictionary from get_umsi_data().
 ## OUTPUT: Return number of PhD students in the data.  (Don't forget, I may change the input data)
 def num_students(data):
-    #print ('nana', data)
+    #look for instances of PhD student and count them up 
     count = 0
     for x in data:
         if 'PhD student' in data[x]:
