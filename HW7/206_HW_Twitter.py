@@ -47,6 +47,8 @@ import twitter_info
 ## Get your secret values to authenticate to Twitter. You may replace each of these 
 ## with variables rather than filling in the empty strings if you choose to do the secure way 
 ## for EC points
+
+#access authentification keys and tokens from twitter_info document 
 consumer_key = twitter_info.consumer_key
 consumer_secret = twitter_info.consumer_secret
 access_token = twitter_info.access_token
@@ -56,15 +58,14 @@ auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
 auth.set_access_token(access_token, access_token_secret)
 # Set up library to grab stuff from twitter with your authentication, and 
 # return it in a JSON-formatted way
-
 api = tweepy.API(auth, parser=tweepy.parsers.JSONParser()) 
-print (api)
 
 ## Write the rest of your code here!
 
 #### Recommended order of tasks: ####
 ## 1. Set up the caching pattern start -- the dictionary and the try/except 
 ## 		statement shown in class.
+
 CACHE_FNAME = 'cache_twitter.json' 
 
 try:
@@ -82,45 +83,47 @@ except:
 
 def getTwitterDataWithCaching(search):
 
+	#check if this search term is in our cached data 
     if search in CACHE_DICTION:
-        print("using cache")
-        return CACHE_DICTION[search]
+        print("using cache") #let user know what is happening
+        return CACHE_DICTION[search] #return the results from cache 
     else:
-        print("fetching")
-        results = api.search(search)
-        #data =results['statuses'][:5]
-        #print (da)
+        print("fetching") #let user know what is happening
+        results = api.search(search) #make request to twitter 
         try:
+        	#add results to cache dictionary in the program 
             CACHE_DICTION[search] =  json.dumps(results)
             dumped_json_cache = json.dumps(CACHE_DICTION)
+            #add the results to cache file outside og the program 
             fw = open(CACHE_FNAME,"w")
             fw.write(dumped_json_cache)
             fw.close() # Close the open file
-            return CACHE_DICTION[search]
+            return CACHE_DICTION[search] #return the results 
         except:
+        	#if request failed, let user know and exit funtion
             print("Wasn't in cache and wasn't valid search either")
             return None
   
 
 ## 3. Using a loop, invoke your function, save the return value in a variable, and explore the 
 ##		data you got back!
-x = 0
-while x < 3:
-	searchTerm = input("Enter Tweet term: ")
-	data = getTwitterDataWithCaching(searchTerm)
-	dictData = json.loads(data)
-	tweets5 = dictData['statuses'][:5]
-	#print(tweets5[0])
-	for tweet in tweets5:
-		print ('TEXT:', tweet['text']) #NOTE GET RID OF REFRESHER
-		print ('READ NOTE')
-		print ('\n')
-		print ('CREATED AT:', tweet['created_at'])
-		print ('\n')
-	x += 1
+
 ## 4. With what you learn from the data -- e.g. how exactly to find the 
 ##		text of each tweet in the big nested structure -- write code to print out 
 ## 		content from 5 tweets, as shown in the linked example.
+
+x = 0
+while x < 3: # limit number of requests 
+	searchTerm = input("Enter Tweet term: ") #get user to input the search 
+	data = getTwitterDataWithCaching(searchTerm) #call function to get result data 
+	dictData = json.loads(data) #load data into dictionary 
+	tweets5 = dictData['statuses'][:5] #get first 5 tweets 
+	for tweet in tweets5:
+		print ('TEXT:', tweet['text']) #extract and print text
+		print ('\n')
+		print ('CREATED AT:', tweet['created_at']) #extract and print time 
+		print ('\n')
+	x += 1 #update counter
 
 
 
