@@ -50,10 +50,10 @@ api = tweepy.API(auth, parser=tweepy.parsers.JSONParser())
 CACHE_FNAME = "206_APIsAndDBs_cache.json"
 # Put the rest of your caching setup here:
 try:
-    cache_file = open(CACHE_FNAME,'r')
-    cache_contents = cache_file.read()
-    cache_file.close()
-    CACHE_DICTION = json.loads(cache_contents)
+    cache_file = open(CACHE_FNAME,'r') #open your file to read in data from cache file 
+    cache_contents = cache_file.read() #read the cache file
+    cache_file.close() #close file
+    CACHE_DICTION = json.loads(cache_contents) #load file string into json dictionary
 except:
     CACHE_DICTION = {}
 
