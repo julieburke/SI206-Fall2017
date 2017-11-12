@@ -67,18 +67,17 @@ def get_user_tweets(user):
 		return CACHE_DICTION[user] #return the results from cache 
 	else:
 		print("fetching") #let user know what is happening
-		twitter_results = api.user_timeline(user)
-		CACHE_DICTION[user] =  twitter_results
-		fw = open(CACHE_FNAME,"w")
-		fw.write(json.dumps(CACHE_DICTION))
+		twitter_results = api.user_timeline(user) #request inputted users timeline
+		CACHE_DICTION[user] =  twitter_results #put in cache dictionary 
+		fw = open(CACHE_FNAME,"w") #open file
+		fw.write(json.dumps(CACHE_DICTION)) #write results into cache file 
 		fw.close() # Close the open file
 		return twitter_results #return the results 
 
 # Write an invocation to the function for the "umich" user timeline and 
 # save the result in a variable called umich_tweets:
-umich_tweets = get_user_tweets("@umich")
+umich_tweets = get_user_tweets("@umich") #call function to get @umich user timeline 
 
-#print (umich_tweets)
 
 
 
@@ -89,40 +88,47 @@ umich_tweets = get_user_tweets("@umich")
 # NOTE: For example, if the user with the "TedXUM" screen name is 
 # mentioned in the umich timeline, that Twitter user's info should be 
 # in the Users table, etc.
-conn = sqlite3.connect('206_APIsAndDBs.sqlite')
-cur = conn.cursor()
-cur.execute('DROP TABLE IF EXISTS Users')
-cur.execute('CREATE TABLE Users (user_id INTEGER NOT NULL PRIMARY KEY, screen_name TEXT, num_favs INTEGER, description TEXT)')
+conn = sqlite3.connect('206_APIsAndDBs.sqlite') #establish connect
+cur = conn.cursor() #define cursor 
+cur.execute('DROP TABLE IF EXISTS Users') #so you can run program multiple times
+cur.execute('CREATE TABLE Users (user_id INTEGER NOT NULL PRIMARY KEY, screen_name TEXT, num_favs INTEGER, description TEXT)') #create table
 
 users = []
+#iterate through tweets
 for tw in umich_tweets:
+	#if tweet author user not in table, add user to table
 	if tw["user"]['id'] not in users:
 		tup = tw["user"]['id'], tw["user"]["screen_name"], tw['user']['favourites_count'], tw["user"]['description']
 		cur.execute("INSERT INTO Users (user_id, screen_name, num_favs, description) VALUES (?,?,?,?)", tup)
-		users.append(tw["user"]['id'])
+		users.append(tw["user"]['id']) 
+	#iterate through users mentioned in each tweet 
 	for u in tw['entities']['user_mentions']:
+		#if user not in table, add user to table
 		if u['id'] not in users:
 			usersearch = api.get_user(u["screen_name"])
 			#print (usersearch)
 			tup = u['id'], u["screen_name"], usersearch['favourites_count'], usersearch['description']
 			cur.execute("INSERT INTO Users (user_id, screen_name, num_favs, description) VALUES (?,?,?,?)", tup)
 			users.append(u['id'])
-conn.commit()
+conn.commit() #commit changes to sql file
 
 ## You should load into the Tweets table: 
 # Info about all the tweets (at least 20) that you gather from the 
 # umich timeline.
 # NOTE: Be careful that you have the correct user ID reference in 
 # the user_id column! See below hints.
-cur.execute('DROP TABLE IF EXISTS Tweets')
+
+cur.execute('DROP TABLE IF EXISTS Tweets')#so you can run program multiple times
+#create table
 cur.execute('CREATE TABLE Tweets (tweet_id INTEGER NOT NULL PRIMARY KEY, text TEXT, user_posted INTEGER , time_posted DATETIME, retweets INTEGER, FOREIGN KEY(user_posted) REFERENCES Users(user_id))')
+#iterate through tweets and add to the sql database table
 for tw in umich_tweets:
 	tup = tw['id'], tw["text"], tw['user']['id'], tw['created_at'], tw['retweet_count'] 
 	cur.execute("INSERT INTO Tweets (tweet_id, text, user_posted, time_posted, retweets) VALUES (?,?,?,?,?)", tup)
 
 #cur.execute('SELECT * FROM Tweets JOIN Users ON Tweets.user_posted = Users.user_id')
            #cur.execute('SELECT Tweets.user_posted from Tweets JOIN Users on Users.user_id = Tweets.user_posted')
-conn.commit()
+conn.commit() #commit changes to sql file
 
 ## HINT: There's a Tweepy method to get user info, so when you have a 
 ## user id or screenname you can find alllll the info you want about 
@@ -179,7 +185,7 @@ joined_data2 = list(cur.execute('SELECT screen_name, text FROM Tweets INNER JOIN
 #print (joined_data2)
 
 
-cur.close()
+cur.close() #close connection
 
 
 ### IMPORTANT: MAKE SURE TO CLOSE YOUR DATABASE CONNECTION AT THE END 
