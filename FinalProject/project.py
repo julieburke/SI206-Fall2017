@@ -3,3 +3,12 @@
 import unittest
 import json
 import sqlite3
+
+def getFacebookData():
+	pass
+
+def getIInstagramData():
+	pass
+
+def getYoutubeData():
+	pass
