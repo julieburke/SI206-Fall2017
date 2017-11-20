@@ -14,3 +14,6 @@ def getIInstagramData():
 
 def getYoutubeData():
 	pass
+
+def getMoreData():
+	pass
