@@ -7,6 +7,7 @@ import requests
 import facebook  #pip install facebook-sdk
 import json
 import sqlite3
+import datetime
 import spotipy 
 import spotipy.util as util 
 from spotipy.oauth2 import SpotifyClientCredentials
@@ -14,18 +15,25 @@ from spotipy.oauth2 import SpotifyClientCredentials
 #import gdata.youtube.service
 from instagram.client import InstagramAPI
 
-import github
+from github import Github
 
 #from InstagramAPI import InstagramAPI
 
 
 def getFacebookData():
-	access_token = 'EAACEdEose0cBAGyhJVCK7vZBdVldCgSPbBym4ZApoAiyO2c1PMnboUotoPSAZAl7SpmBnnvnL4lw0ZA2VW5hAiqucmG98zEGms3dPOm4Of9Tblay22zePFJoZAntIJj60ZA3v02UGNmtDSQqiLlANO0btgEjirDG668x6fLnSZCnjRRyBZCsc1iy4Ul0RZBI5oy0ynfTncntSaAZDZD'
+	access_token = 'EAACEdEose0cBAF31k2eZCHLweo7agGFmoxZA2KSKAB5TI9Qg69fk0UiiTZCDqfVBa7RadZCIYyzQN1ZCwIWeaWpsyAChwUOg9OfIqxl9rL1w2ZCUUy9PZAea6uXDBFDudmJJM42PL5Lb8GyjkPdf2YjW0UUHFENUKoseLcga4GNXB8l8k1Enjg9cE1VAqCnFLKuPQmLOmqmZCP5ZCZCtmvcHMCimHZCMKEYPHwZD'
 	graph = facebook.GraphAPI(access_token)
-	data = graph.get_connections('me','user_work_history') 
+	all_fields = ['created_time']
+	times = []
+	#all_fields = ','.join(all_fields)
+	#data = graph.get_connections('me','user_work_history') 
+	posts = graph.get_connections('me','posts', fields = all_fields, limit = 100) 
+	for post in posts['data']:
+		times.append(post['created_time'])
+
 	# profile = graph.get_object('me', fields = 'name,location{location}') #fields is an optional key word argument
-	return json.dumps(data)
-#print (getFacebookData())
+	#return json.dumps(data)
+#getFacebookData()
 def getInstagramData():
 	#from instagram.client import InstagramAPI
 
@@ -33,7 +41,7 @@ def getInstagramData():
 	client_secret = "e8809122b94b40218bfb840e099393fd"
 	access_token ='53913195.b21d1a2.12381295c6614aeaae1c15a8baa62e56'
 	api = InstagramAPI(access_token = access_token, client_id= client_id,client_secret=client_secret)
-	recent = api.user_recent_media(user_id="53913195", count=100)
+	recent = api.user_liked_media(user_id="53913195", count=100, scope = 'public_content')
 	print (type(recent))
 	print (len(recent))
 	print (type(recent[0]))
@@ -45,7 +53,7 @@ def getInstagramData():
 	#recent_media, next_ = api.user_recent_media(user_id="userid", count=10)
 	#for media in recent_media:
   		#print media.caption.text
-getInstagramData()
+#getInstagramData()
 def getYoutubeData():
 	pass
 
@@ -74,20 +82,19 @@ def getSpotifyData():
 	#GET https://api.spotify.com/v1/me/player/recently-played
 
 #getSpotifyData()
-def getAppleHealthData():
-	pass
-	#https://developer.apple.com/documentation/healthkit
+
 
 def getGitHubData():
 	#git = PyGithub('61dba3f8bc30ed30edb03edab2cf6c40052a0f93')
-	g = github.Github('61dba3f8bc30ed30edb03edab2cf6c40052a0f93')
-	print (g.get_user())
+	#g = github.Github('61dba3f8bc30ed30edb03edab2cf6c40052a0f93')
+	#print (g.get_user())
 
-	#g = Github("julieburke", "Julieblue15!")
+	g = Github("julieburke", "Julieblue15!")
+	print ((g.get_repos()._PaginatedList__headers))
 	#print (g)
 	#print (dir(g))
 	#print (g.get_user())
-#getGitHubData()
+getGitHubData()
 
 def getCanvasData():
 	pass
