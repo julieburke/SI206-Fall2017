@@ -11,6 +11,10 @@ import datetime
 import spotipy 
 import spotipy.util as util 
 from spotipy.oauth2 import SpotifyClientCredentials
+import re
+import plotly
+import plotly.plotly as py
+import plotly.graph_objs as go
 #import gdata
 #import gdata.youtube.service
 from instagram.client import InstagramAPI
@@ -19,18 +23,55 @@ from github import Github
 
 #from InstagramAPI import InstagramAPI
 
+CACHE_FNAME = "final_project_cache.json"
+# Put the rest of your caching setup here:
+try:
+    cache_file = open(CACHE_FNAME,'r') #open your file to read in data from cache file 
+    cache_contents = cache_file.read() #read the cache file
+    cache_file.close() #close file
+    CACHE_DICTION = json.loads(cache_contents) #load file string into json dictionary
+except:
+    CACHE_DICTION = {}
+
 
 def getFacebookData():
-	access_token = 'EAACEdEose0cBAF31k2eZCHLweo7agGFmoxZA2KSKAB5TI9Qg69fk0UiiTZCDqfVBa7RadZCIYyzQN1ZCwIWeaWpsyAChwUOg9OfIqxl9rL1w2ZCUUy9PZAea6uXDBFDudmJJM42PL5Lb8GyjkPdf2YjW0UUHFENUKoseLcga4GNXB8l8k1Enjg9cE1VAqCnFLKuPQmLOmqmZCP5ZCZCtmvcHMCimHZCMKEYPHwZD'
-	graph = facebook.GraphAPI(access_token)
-	all_fields = ['created_time']
-	times = []
-	#all_fields = ','.join(all_fields)
-	#data = graph.get_connections('me','user_work_history') 
-	posts = graph.get_connections('me','posts', fields = all_fields, limit = 100) 
-	for post in posts['data']:
-		times.append(post['created_time'])
+	if 'facebook' in CACHE_DICTION:
+		print("using cache") #let user know what is happening
+		return CACHE_DICTION['facebook'] #return the results from cache 
+	else:
+		print("fetching") #let user know what is happening
+		access_token = 'EAACEdEose0cBAIvRYHxTxYIqL49tSx0sHNZAkvPskd2ZBMEvP6H37pvLa1fvwykWZAXVZBb2FdLnRlSZBFNWiJhdevG9JRLskCOAee1TVVuS0zC7ed4vgzOBNL0YZCLVAkdbZCb0cCwW3ZA11PkL7Do2im5PrE5QknsY2wymCGnGioFvvuhjaPWyQAzWDIYnQfQZD'
+		graph = facebook.GraphAPI(access_token)
+		all_fields = ['created_time']
+		day_count = {}
+		#all_fields = ','.join(all_fields)
+		#data = graph.get_connections('me','user_work_history') 
+		posts = graph.get_connections('me','posts', fields = all_fields, limit = 100) 
+		for post in posts['data']:
+			date = re.findall('([0-9]*-[0-9]*-[0-9]*)T',post['created_time'])
+			change = datetime.datetime.strptime(date[0], '%Y-%m-%d')
+			day = change.isoweekday()
+			if day == 1:
+				day = 'Monday'
+			if day == 2:
+				day = 'Tuesday'
+			if day == 3:
+				day = 'Wednesday'
+			if day == 4:
+				day = 'Thursday'
+			if day == 5:
+				day = 'Friday'
+			if day == 6:
+				day = 'Saturday'
+			if day == 7:
+				day = 'Sunday'
 
+			day_count[day] = day_count.get(day, 0) + 1
+		CACHE_DICTION['facebook'] =  day_count #put in cache dictionary 
+		fw = open(CACHE_FNAME,"w") #open file
+		fw.write(json.dumps(CACHE_DICTION)) #write results into cache file 
+		fw.close()
+		return day_count
 	# profile = graph.get_object('me', fields = 'name,location{location}') #fields is an optional key word argument
 	#return json.dumps(data)
 #getFacebookData()
@@ -101,4 +142,30 @@ def getCanvasData():
 
 def getGmailData():
 	API_KEY = "AIzaSyDK5Xmn3UcnN7oNQur68eM1pols6RE6pcM"
+
+def visualizeDayofWeekData(dictionary):
+	plotly.tools.set_credentials_file(username='julieburke', api_key='EnRYcjJL5LUMtyi8Zt5Q')
+	days = []
+	counts = []
+	items = dictionary.items()
+	for k,v in items:
+		days.append(k)
+		counts.append(v)
+	print (days)
+	print (counts)
+	layout = go.Layout(title='Facebook Usage By Day')
+	data = [go.Bar(x = days,y = counts)]
+	py.iplot(data, file_id='basic-bar')
+	#fig = go.Figure(data=data, layout=layout)
+	#fig.show()
+visualizeDayofWeekData(getFacebookData())
+
+
+def writetoDatabase(dictionary):
+	conn = sqlite3.connect('206_APIsAndDBs.sqlite') #establish connect
+	cur = conn.cursor() #define cursor 
+	cur.execute('DROP TABLE IF EXISTS Users') #so you can run program multiple times
+	cur.execute('CREATE TABLE Users (user_id INTEGER NOT NULL PRIMARY KEY, screen_name TEXT, num_favs INTEGER, description TEXT)') #create table
+
+
 	
