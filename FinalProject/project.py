@@ -32,7 +32,7 @@ def getFacebookData():
 		return CACHE_DICTION['facebook'] #return the results from cache 
 	else:
 		print("fetching") #let user know what is happening
-		access_token = 'EAACEdEose0cBALgO2OKMUzw2ZAPVtPdqwT7aLIGNHZB7mgTn32pq204Xd6HCKj1yNxOCfpd6TKAmIXh0pfZBQKc5HkVuWwBUw5hSidA9u8nH4kPsV4dnSvfjYUv2OqkJLoXfZAMDsFju4PP3r8dmdZCOLdFTuuouvZBjkOhtwR1AcZCtUIOqa9AmHKwd4bMxZBYDZC0IFIxz3TAZDZD'
+		access_token = 'EAACEdEose0cBAOX1h5juTCRfAi2z9lYoTXHLpgOWV3BdMl0DyFBobyDOHBPM9RZCnXIxvo8JZCXxnNZCFbfF3qNoTMgNwCP5tQFZBAz4OLaGFif6tFWcGjqxSsXGzZB0SpdvlXtBtWY5MZAJ8qUOGd3bccysl5cfWlg4LhFuKwzEkcSzv0ZCwtRGtXNIHVcroH0AZBPhnZBNfGAZDZD'
 		graph = facebook.GraphAPI(access_token)
 		
 		all_fields = ['created_time']
@@ -52,14 +52,15 @@ def getFacebookData():
 def getInstagramData():
 	#from instagram.client import InstagramAPI
 	data = []
-	client_id = "b21d1a2d5cec4f5a9c676dccd8aeb57b"
-	client_secret = "e8809122b94b40218bfb840e099393fd"
-	access_token ='53913195.b21d1a2.12381295c6614aeaae1c15a8baa62e56'
+	client_id = "1b5f1a1cb43046979f5d7176a9338a0f"
+	client_secret = "50093b46a5be47b996101ed15c66b222 "
+	access_token ='53913195.1b5f1a1.d6cf6e96d02745bb82bec42f6c07de80'
 	#api = InstagramAPI(access_token = access_token, client_id= client_id,client_secret=client_secret)
 	#recent = api.user_recent_media(user_id="53913195", count=100, fields = 'location')
 	#print (type(recent[0]))
-	url = 'https://api.instagram.com/v1/users/self/media/recent/?access_token=53913195.b21d1a2.12381295c6614aeaae1c15a8baa62e56'
+	url = 'https://api.instagram.com/v1/users/self/media/recent/?count=100/?access_token=53913195.1b5f1a1.d6cf6e96d02745bb82bec42f6c07de80'
 	response = requests.get(url)
+	print (response.text)
 	locations = []
 	for post in json.loads(response.text)['data']:
 		if post['location']:
@@ -146,11 +147,10 @@ def gmaps(results):
 	for post in results:
 		lats.append(post[1])
 		longs.append(post[2])
-	gmap.scatter(lats, longs, 'purple', edge_width=10)
-#gmap.scatter(more_lats, more_lngs, '#3B0B39', size=40, marker=False)
-#gmap.scatter(marker_lats, marker_lngs, 'k', marker=True)
-#gmap.heatmap(heat_lats, heat_lngs)
+	gmap.scatter(lats, longs, 'purple', size=25)
 	gmap.draw("mymap.html")
+	gmap.heatmap(lats, longs)
+	gmap.draw("mymap2.html")
 gmaps(instagram_posts)
 
 
