@@ -13,16 +13,17 @@ import plotly
 import plotly.plotly as py
 import plotly.graph_objs as go
 import googlemaps
+import gmplot
 
-def cache_setup():
-	CACHE_FNAME = "final_project_cache.json"
-	try:
-    	cache_file = open(CACHE_FNAME,'r') #open your file to read in data from cache file 
-    	cache_contents = cache_file.read() #read the cache file
-    	cache_file.close() #close file
-    	CACHE_DICTION = json.loads(cache_contents) #load file string into json dictionary
-	except:
-    	CACHE_DICTION = {}
+
+CACHE_FNAME = "final_project_cache.json"
+try:
+	cache_file = open(CACHE_FNAME,'r') #open your file to read in data from cache file 
+	cache_contents = cache_file.read() #read the cache file
+	cache_file.close() #close file
+	CACHE_DICTION = json.loads(cache_contents) #load file string into json dictionary
+except:
+    CACHE_DICTION = {}
 
 
 def getFacebookData():
@@ -138,8 +139,19 @@ for post in instagram_posts:
 	cur.execute("INSERT INTO Instagram (post_id, latitude, longitude) VALUES (?,?,?)", post)
 conn.commit() #commit changes to sql file
 
-
-
+def gmaps(results):
+	gmap = gmplot.GoogleMapPlotter(33.0858, 39.29465, 3)
+	lats = []
+	longs = []
+	for post in results:
+		lats.append(post[1])
+		longs.append(post[2])
+	gmap.scatter(lats, longs, 'purple', edge_width=10)
+#gmap.scatter(more_lats, more_lngs, '#3B0B39', size=40, marker=False)
+#gmap.scatter(marker_lats, marker_lngs, 'k', marker=True)
+#gmap.heatmap(heat_lats, heat_lngs)
+	gmap.draw("mymap.html")
+gmaps(instagram_posts)
 
 
 
